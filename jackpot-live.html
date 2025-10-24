@@ -1,0 +1,191 @@
+<!DOCTYPE html>
+<html lang="th">
+<head>
+  <meta charset="UTF-8">
+  <title>แจ็คพอตอัปเดตสด 🎰</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <style>
+    @import url('https://fonts.googleapis.com/css2?family=Prompt&display=swap');
+
+    body {
+      font-family: 'Prompt', sans-serif;
+      background: linear-gradient(45deg, #000428, #004e92);
+      margin: 0;
+      padding: 16px;
+      color: #ffffff;
+    }
+
+    .jackpot-box {
+      background: rgba(0, 102, 255, 0.1);
+      border: 2px solid #00bfff;
+      border-radius: 16px;
+      padding: 24px;
+      text-align: center;
+      box-shadow: 0 0 20px #00bfff;
+      margin-bottom: 20px;
+    }
+
+    .jackpot-title {
+      font-size: 20px;
+      font-weight: bold;
+      color: #00ffff;
+      text-shadow: 0 0 10px #00ffff;
+    }
+
+    .jackpot-amount {
+      font-size: 42px;
+      color: #00bfff;
+      font-weight: bold;
+      text-shadow: 0 0 10px #00bfff;
+    }
+
+    .updated-time {
+      font-size: 14px;
+      color: #aad8ff;
+    }
+
+    .withdraw-section {
+      background: rgba(0, 0, 50, 0.3);
+      border: 2px solid #00bfff;
+      border-radius: 16px;
+      box-shadow: 0 0 20px #00bfff;
+      padding: 10px;
+    }
+
+    .section-title {
+      background: #0066ff;
+      text-align: center;
+      padding: 12px;
+      border-radius: 14px;
+      font-size: 18px;
+      font-weight: bold;
+      margin-bottom: 12px;
+      text-shadow: 0 0 10px #ffffff;
+    }
+
+    .withdraw-card {
+      background: rgba(255, 255, 255, 0.08);
+      margin: 6px 0;
+      padding: 10px;
+      border-radius: 12px;
+      color: #ffffff;
+      font-size: 14px;
+      box-shadow: 0 0 10px #0066ff;
+      transition: transform 0.3s ease;
+    }
+
+    .withdraw-card:hover {
+      transform: scale(1.03);
+    }
+
+    .top-line {
+      display: flex;
+      justify-content: space-between;
+      margin-bottom: 4px;
+    }
+
+    .name-bank {
+      font-weight: bold;
+    }
+
+    .amount {
+      color: #00ffff;
+      font-weight: bold;
+    }
+
+    .date, .ref, .status {
+      font-size: 11px;
+      color: #aad8ff;
+    }
+
+    .status {
+      margin-top: 2px;
+    }
+  </style>
+</head>
+<body>
+
+  <div class="jackpot-box">
+    <div class="jackpot-title">🎯 แจ็คพอตที่จ่ายไปแล้ว</div>
+    <div class="jackpot-amount" id="jackpotAmount">429,000,000 บาท</div>
+    <div class="updated-time" id="updateTime">อัปเดตล่าสุด: --:--:--</div>
+  </div>
+
+  <div class="withdraw-section">
+    <div class="section-title">กำลังถอนเงิน</div>
+    <div id="withdraw-list"></div>
+  </div>
+
+  <script>
+    let currentJackpot = 429000000;
+    let displayJackpot = currentJackpot;
+    const jackpotElement = document.getElementById("jackpotAmount");
+    const timeElement = document.getElementById("updateTime");
+
+    // เอฟเฟกต์นับลื่น
+    function animateJackpot() {
+      displayJackpot += (currentJackpot - displayJackpot) * 0.1;
+      jackpotElement.innerText = Math.floor(displayJackpot).toLocaleString() + " บาท";
+      requestAnimationFrame(animateJackpot);
+    }
+
+    // อัปเดตค่าแจ็คพอต
+    function fetchJackpotData() {
+      const randomIncrease = Math.floor(Math.random() * (100000 - 5000 + 1)) + 5000;
+      currentJackpot += randomIncrease;
+
+      const now = new Date();
+      timeElement.innerText = "อัปเดตล่าสุด: " + now.toLocaleTimeString();
+    }
+
+    // สุ่มชื่อผู้ถอน
+    function getRandomName() {
+      const firstNames = ["วิราพร", "สมชาย", "สุชาติ", "กานต์", "ณัฐ", "สายฝน", "อภิชาติ"];
+      const lastNames = ["สุขใจ", "ใจดี", "ทองแท้", "แสงทอง", "เพชรรัตน์"];
+      const name = firstNames[Math.floor(Math.random() * firstNames.length)];
+      const surname = lastNames[Math.floor(Math.random() * lastNames.length)];
+      return `${name} ${surname}`;
+    }
+
+    // สร้างรายการถอน
+    function generateWithdrawCard() {
+      const name = getRandomName();
+      const phone = "0" + Math.floor(Math.random() * 900000000 + 100000000);
+      const amount = (Math.random() * 100000).toFixed(2);
+      const now = new Date().toLocaleString("th-TH");
+      const ref = "REF#" + Math.floor(Math.random() * 1000000000);
+
+      return `
+        <div class="withdraw-card">
+          <div class="top-line">
+            <div class="name-bank">${name} (${phone.slice(0,3)}-XXX-${phone.slice(-3)})</div>
+            <div class="amount">${parseFloat(amount).toLocaleString()} ฿</div>
+          </div>
+          <div class="date">${now}</div>
+          <div class="ref">${ref}</div>
+          <div class="status">⌛️ กำลังถอน</div>
+        </div>`;
+    }
+
+    // อัปเดตรายการถอน
+    function updateWithdrawList() {
+      const list = document.getElementById("withdraw-list");
+      const newCard = generateWithdrawCard();
+      list.insertAdjacentHTML('afterbegin', newCard);
+
+      while (list.children.length > 5) {
+        list.removeChild(list.lastElementChild);
+      }
+
+      const nextDelay = Math.floor(Math.random() * 10000) + 1000;
+      setTimeout(updateWithdrawList, nextDelay);
+    }
+
+    // เริ่มทำงาน
+    animateJackpot();
+    setInterval(fetchJackpotData, 1000);
+    updateWithdrawList();
+  </script>
+
+</body>
+</html>
