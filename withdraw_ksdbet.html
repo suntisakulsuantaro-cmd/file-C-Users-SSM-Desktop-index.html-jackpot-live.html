@@ -1,0 +1,335 @@
+<!doctype html>
+<html lang="th">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width,initial-scale=1" />
+<title>ระบบถอนออโต้ KSDBET</title>
+<style>
+  :root{
+    --bg:#070607;
+    --panel:#0d0d0d;
+    --gold:#ffb300;
+    --muted:#9b8f7a;
+    --card:#0f0f0f;
+  }
+  html,body{height:100%;margin:0;background:
+    radial-gradient(800px 300px at 70% 10%, rgba(255,179,0,0.06), transparent 10%),
+    linear-gradient(180deg,#060606 0%, #0b0b0b 100%);
+    font-family: "Noto Sans Thai", "Sarabun", "Segoe UI", Roboto, Arial, sans-serif;
+    -webkit-font-smoothing:antialiased;
+    color:#f7f5f0;
+  }
+
+  .wrap{max-width:480px;margin:26px auto;padding:18px;}
+
+  .card{
+    background: linear-gradient(180deg, rgba(255,255,255,0.03), rgba(0,0,0,0.02));
+    border-radius:14px;
+    overflow:hidden;
+    border:1px solid rgba(255,179,0,0.08);
+    box-shadow: 0 18px 60px rgba(0,0,0,0.6);
+    position:relative;
+  }
+
+  /* watermark */
+  .watermark{
+    position:absolute;
+    right:10px;
+    bottom:8px;
+    font-size:11px;
+    color:rgba(255,255,255,0.06);
+    pointer-events:none;
+    font-weight:700;
+  }
+
+  .hero{
+    padding:16px;
+    display:flex;
+    gap:12px;
+    align-items:center;
+    background: linear-gradient(90deg, rgba(255,179,0,0.06), rgba(0,0,0,0.02));
+    border-bottom:1px solid rgba(255,179,0,0.04);
+  }
+  .hero .title{
+    font-weight:900;
+    font-size:16px;
+    color:var(--gold);
+    letter-spacing:0.3px;
+  }
+  .hero .subtitle{font-size:13px;color:var(--muted);}
+
+  .marquee{
+    height:10px;
+    flex:1;
+    border-radius:999px;
+    background:linear-gradient(90deg, rgba(255,179,0,0.12), rgba(255,220,120,0.04));
+    position:relative; overflow:hidden;
+  }
+  .marquee::after{
+    content:'';
+    position:absolute;
+    left:-40%;
+    top:0;
+    height:100%;
+    width:40%;
+    background: linear-gradient(90deg, rgba(255,255,255,0.35), rgba(255,255,255,0.02));
+    animation: slide 2.4s linear infinite;
+  }
+  @keyframes slide{ from{left:-40%} to{left:120%} }
+
+  .list-wrap{padding:12px; background: linear-gradient(180deg, rgba(0,0,0,0.03), rgba(0,0,0,0.02));}
+  .w-list{
+    max-height:420px;
+    overflow:auto;
+    scroll-behavior:smooth;
+    padding-right:6px;
+  }
+
+  .item{
+    display:flex;
+    gap:12px;
+    align-items:center;
+    padding:10px;
+    border-radius:10px;
+    margin-bottom:10px;
+    background: linear-gradient(180deg, rgba(255,255,255,0.02), rgba(0,0,0,0.02));
+    border:1px solid rgba(255,255,255,0.02);
+    transition: transform .28s ease, box-shadow .28s ease, background .35s;
+  }
+  .item.new{
+    transform:translateY(-6px);
+    box-shadow: 0 18px 48px rgba(0,0,0,0.45);
+    border-left:4px solid var(--gold);
+    background: linear-gradient(180deg, rgba(255,248,230,0.02), rgba(0,0,0,0.02));
+  }
+
+  .bank-sq{
+    width:52px;height:52px;border-radius:10px;flex-shrink:0;
+    display:flex;align-items:center;justify-content:center;font-weight:800;color:#fff;
+    box-shadow:0 8px 20px rgba(0,0,0,0.45);
+  }
+
+  .left{flex:1;min-width:0}
+  .name{font-weight:800;font-size:15px;color:#fff;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;}
+  .meta{font-size:12px;color:var(--muted);margin-top:6px;}
+  .ref{display:block;font-size:11px;color:#bbb;margin-top:6px}
+  .amount{font-weight:900;font-size:15px;min-width:125px;text-align:right;color:var(--gold)}
+
+  .safety{
+    padding:10px 12px;
+    font-size:12px;
+    color:#cfc9bf;
+    border-top:1px dashed rgba(255,255,255,0.03);
+    background: linear-gradient(180deg, rgba(0,0,0,0.01), rgba(0,0,0,0.00));
+  }
+
+  .contact-btn{
+    display:inline-block;
+    padding:8px 12px;
+    border-radius:8px;
+    background:linear-gradient(90deg,#00c300,#00a83c);
+    color:white;
+    text-decoration:none;
+    font-weight:700;
+    margin-top:8px;
+  }
+
+  /* small screens */
+  @media (max-width:420px){
+    .wrap{padding:10px}
+    .bank-sq{width:44px;height:44px}
+    .amount{min-width:95px;font-size:14px}
+  }
+</style>
+</head>
+<body>
+  <div class="wrap">
+    <div class="card" role="region" aria-label="ระบบถอนออโต้ KSDBET">
+      <div class="hero">
+        <div style="display:flex;flex-direction:column;gap:3px;">
+          <div class="title">ระบบถอนออโต้ KSDBET</div>
+          <div class="subtitle">รายการถอนล่าสุด — แสดงเรียลไทม์</div>
+        </div>
+        <div class="marquee" aria-hidden="true"></div>
+      </div>
+
+      <div class="list-wrap">
+        <div id="wlist" class="w-list" aria-live="polite" aria-atomic="false"></div>
+      </div>
+
+      <div class="safety">
+        ระบบนี้เป็นการแสดงผลข้อมูลอัตโนมัติจาก KSDBET — หากมีปัญหาหรือสงสัย กรุณาติดต่อทีมงานได้ตลอด 24 ชั่วโมง
+        <div><a class="contact-btn" href="https://lin.ee/yZXo3WG" target="_blank" rel="noopener">ติดต่อแอดมิน (Line)</a></div>
+      </div>
+
+      <div class="watermark">KSDBET Official System</div>
+    </div>
+  </div>
+
+<audio id="tick-audio" preload="auto">
+  <source src="data:audio/wav;base64,UklGRiQAAABXQVZFZm10IBAAAAABAAEAQB8AAEAfAAABAAgAZGF0YQAAAAA=" type="audio/wav">
+</audio>
+
+<script>
+/* ====== CONFIG ====== */
+const VISIBLE_ROWS = 8;
+const ADD_INTERVAL = 2500; // ms between new items
+const MIN_AMOUNT = 1000;
+const MAX_AMOUNT = 50000;
+const BANKS = [
+  {code:'KBANK', name:'กสิกรไทย', color:'#19a25a', short:'กสิกร'},
+  {code:'SCB',   name:'ไทยพาณิชย์', color:'#6b2aa8', short:'ไทยพาณิย์'},
+  {code:'BAY',   name:'กรุงศรีอยุธยา', color:'#e2001a', short:'กรุงศรี'},
+  {code:'BKK',   name:'กรุงเทพ', color:'#013a8b', short:'กรุงเทพ'},
+  {code:'KTB',   name:'กรุงไทย', color:'#0070c0', short:'กรุงไทย'},
+  {code:'TMB',   name:'ทหารไทย', color:'#ef6c00', short:'ทหารไทย'},
+  {code:'GSB',   name:'ออมสิน', color:'#00793f', short:'ออมสิน'},
+  {code:'BBL',   name:'กรุงศรี', color:'#2f7bde', short:'ทิสโก้'}
+];
+/* ==================== */
+
+/* ชุดชื่อ */
+const firstNames = ["สมชาย","สมศักดิ์","อภิชาติ","วิรพร","อภินันท์","ณัฐพล","ธนกร","ณิชา","ปวีร์","ศักดิ์","ยอดชาย","อรรถพล","ธนายง","สุนทร","วรพล"];
+const lastNames  = ["เพชรรัตน์","แสงทอง","สุขใจ","ทองแท้","กาญจน์","เกษมสุข","ชัยยะ","สำราญ","ประเสริฐ","วิชัย","สมบัติ","บุญมา","ธนกิจ","สิทธิชัย","พิทักษ์"];
+
+function rand(arr){ return arr[Math.floor(Math.random()*arr.length)]; }
+function randomThaiName(){ return rand(firstNames) + ' ' + rand(lastNames); }
+function randomMaskedPhone(){
+  const prefixes = ["06","08","09","07"];
+  const p = prefixes[Math.floor(Math.random()*prefixes.length)] + String(Math.floor(Math.random()*10));
+  const t1 = String(Math.floor(100 + Math.random()*899));
+  const t2 = String(Math.floor(100 + Math.random()*899));
+  return `${p}-XXX-${t2}`;
+}
+function randomAmount(){
+  const n = Math.random()*(MAX_AMOUNT - MIN_AMOUNT) + MIN_AMOUNT;
+  return Math.round(n*100)/100;
+}
+function formatMoney(n){
+  return new Intl.NumberFormat('en-US',{minimumFractionDigits:2, maximumFractionDigits:2}).format(n) + ' ฿';
+}
+function genRef(){
+  return String(Math.floor(100000 + Math.random()*899999)); // ตัวเลขล้วน
+}
+function nowString(){
+  const d = new Date();
+  const pad = s=>String(s).padStart(2,'0');
+  return `${pad(d.getDate())}/${pad(d.getMonth()+1)}/${d.getFullYear()} ${pad(d.getHours())}:${pad(d.getMinutes())}:${pad(d.getSeconds())}`;
+}
+
+/* DOM */
+const listEl = document.getElementById('wlist');
+let pool = [];
+
+function escapeHtml(s){ return String(s).replace(/[&<>"']/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c])); }
+
+function obfuscateName(name){
+  // แปลงชื่อเป็นชื่อย่อ เช่น "สมชาย" -> "สม." หรือ "สมชาย" -> first char + lastName initial
+  const parts = name.split(' ');
+  if(parts.length===1) return parts[0];
+  const fname = parts[0];
+  const lname = parts[1];
+  const fnameAb = fname.length>1 ? fname.charAt(0) + fname.slice(1,2) + '.' : fname;
+  // show first three letters of first name + last name initial + '***'
+  const fshort = fname.length<=3 ? fname : fname.slice(0,3);
+  return fshort + ' ' + lname.slice(0,3) + '***';
+}
+
+function obfuscateAccountDisplay(full){
+  // ตัวอย่างที่เลือก: แบบ B = ชื่อย่อ + เลข 3 ตัวท้าย
+  // full is unused here; we'll generate display from name and a fake account tail
+  return null;
+}
+
+function makeItemDOM(data){
+  // account tail 3 digits
+  const tail = String(Math.floor(100 + Math.random()*899));
+  const nameAb = (function(){
+    const parts = data.name.split(' ');
+    const f = parts[0]||'ลูกค้า';
+    const short = f.length<=3 ? f : f.slice(0,3);
+    return short + '***';
+  })();
+  const accDisplay = `${data.bank.name} • ${nameAb} • ••${tail}`;
+
+  const div = document.createElement('div');
+  div.className = 'item';
+  div.innerHTML = `
+    <div class="bank-sq" style="background:${data.bank.color}">
+      <div style="text-align:center;font-size:13px">${escapeHtml(data.bank.short)}</div>
+    </div>
+    <div class="left">
+      <div class="name">${escapeHtml(data.name)} (${escapeHtml(data.phone)})</div>
+      <div class="meta">${escapeHtml(accDisplay)} • ${escapeHtml(data.time)}</div>
+      <div class="ref">REF: ${escapeHtml(data.ref)}</div>
+    </div>
+    <div class="amount">${formatMoney(data.amount)}</div>
+  `;
+  return div;
+}
+
+function createRandomItem(){
+  return {
+    bank: BANKS[Math.floor(Math.random()*BANKS.length)],
+    name: randomThaiName(),
+    phone: randomMaskedPhone(),
+    amount: randomAmount(),
+    ref: genRef(),
+    time: nowString()
+  };
+}
+
+function renderAll(){
+  listEl.innerHTML = '';
+  for(const it of pool) listEl.appendChild(makeItemDOM(it));
+}
+
+function playTick(){
+  try{
+    const audio = document.getElementById('tick-audio');
+    // audio data is empty minimal; better to use WebAudio click
+    // generate short click via WebAudio for reliability
+    const ctx = new (window.AudioContext || window.webkitAudioContext)();
+    const o = ctx.createOscillator();
+    const g = ctx.createGain();
+    o.type = 'square';
+    o.frequency.value = 1200;
+    g.gain.value = 0.02;
+    o.connect(g); g.connect(ctx.destination);
+    o.start();
+    setTimeout(()=>{ o.stop(); ctx.close(); }, 40);
+  }catch(e){}
+}
+
+function pushNew(){
+  const it = createRandomItem();
+  pool.unshift(it);
+  if(pool.length > VISIBLE_ROWS) pool = pool.slice(0, VISIBLE_ROWS);
+  renderAll();
+
+  // highlight new
+  const first = listEl.querySelector('.item');
+  if(first){
+    first.classList.add('new');
+    setTimeout(()=> first.classList.remove('new'), 800);
+  }
+
+  // play sound
+  playTick();
+
+  // scroll to top so newest visible
+  listEl.scrollTo({ top: 0, behavior: 'smooth' });
+}
+
+/* init */
+(function init(){
+  for(let i=0;i<VISIBLE_ROWS;i++) pool.push(createRandomItem());
+  renderAll();
+  // ensure top visible
+  setTimeout(()=> listEl.scrollTo({ top: 0 }), 120);
+  // continuous
+  setInterval(()=> pushNew(), ADD_INTERVAL);
+})();
+</script>
+</body>
+</html>
